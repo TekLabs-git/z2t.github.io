@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="fr" class="dark scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Z2T - Launcher & Serveur Minecraft</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            darkBg: '#090b10',
+                            cardBg: 'rgba(15, 23, 42, 0.65)',
+                            neonGreen: '#10b981',
+                            greenGlow: '#059669',
+                            purple: '#8b5cf6',
+                            purpleGlow: '#7c3aed'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Outfit', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace']
+                    },
+                    animation: {
+                        'pulse-glow': 'pulseGlow 4s ease-in-out infinite',
+                        'float': 'float 6s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        pulseGlow: {
+                            '0%, 100%': { opacity: '0.4', transform: 'scale(1)' },
+                            '50%': { opacity: '0.7', transform: 'scale(1.05)' }
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-10px)' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@500;700&family=Outfit:wght@600;800;900&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        body {
+            background-color: #090b10;
+            overflow-x: hidden;
+        }
+
+        #bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.65);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+        }
+
+        .glass-panel-glow {
+            box-shadow: 0 0 30px rgba(16, 185, 129, 0.15), 0 20px 50px rgba(0, 0, 0, 0.6);
+        }
+
+        .btn-glow {
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .btn-glow::before {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            background: linear-gradient(90deg, #10b981, #8b5cf6);
+            border-radius: 16px;
+            z-index: -1;
+            opacity: 0.6;
+            filter: blur(12px);
+            transition: opacity 0.3s ease;
+        }
+
+        .btn-glow:hover::before {
+            opacity: 1;
+            filter: blur(16px);
+        }
+    </style>
+</head>
+
+<body class="bg-brand-darkBg text-slate-100 font-sans antialiased min-h-screen flex flex-col justify-between relative selection:bg-brand-neonGreen selection:text-black">
+
+    <!-- Interactive Canvas Particle Background -->
+    <canvas id="bg-canvas"></canvas>
+
+    <!-- Ambient Glowing Orbs -->
+    <div class="fixed top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-brand-purple/20 rounded-full filter blur-[150px] animate-pulse-glow pointer-events-none"></div>
+    <div class="fixed bottom-10 left-1/2 -translate-x-1/2 w-[450px] h-[450px] bg-brand-neonGreen/15 rounded-full filter blur-[150px] animate-pulse-glow pointer-events-none" style="animation-delay: 2s;"></div>
+
+    <!-- Header / Brand Logo -->
+    <header class="w-full py-8 relative z-10">
+        <div class="max-w-4xl mx-auto px-4 flex items-center justify-center">
+            <div class="flex items-center space-x-3.5 group cursor-pointer">
+                <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-brand-purple via-emerald-500 to-brand-neonGreen p-0.5 shadow-lg shadow-brand-neonGreen/20 transition-transform duration-300 group-hover:scale-105">
+                    <div class="w-full h-full bg-slate-950 rounded-[14px] flex items-center justify-center">
+                        <span class="font-display font-black text-xl text-transparent bg-clip-text bg-gradient-to-r from-brand-neonGreen to-brand-purple">Z2T</span>
+                    </div>
+                </div>
+                <div class="flex flex-col">
+                    <span class="font-display font-black text-2xl tracking-wider text-white">Z2T<span class="text-brand-neonGreen">.MC</span></span>
+                    <span class="text-[10px] uppercase tracking-widest text-slate-400 font-bold -mt-1">Serveur Minecraft</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="flex-grow flex items-center justify-center py-8 px-4 relative z-10">
+        <div class="max-w-lg w-full space-y-8 text-center animate-float" style="animation-duration: 8s;">
+            
+            <!-- Hero Title -->
+            <div class="space-y-3">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-neonGreen/10 border border-brand-neonGreen/30 text-brand-neonGreen text-xs font-semibold tracking-wide uppercase">
+                    <span class="w-2 h-2 rounded-full bg-brand-neonGreen animate-ping"></span>
+                    Launcher Officiel Disponible
+                </div>
+                <h1 class="font-display text-4xl sm:text-6xl font-black text-white tracking-tight leading-none">
+                    SERVEUR <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-neonGreen via-emerald-400 to-brand-purple">Z2T</span>
+                </h1>
+                <p class="text-slate-400 text-sm sm:text-base max-w-sm mx-auto">
+                    Téléchargez le launcher officiel pour accéder directement au serveur.
+                </p>
+            </div>
+
+            <!-- Central Glassmorphic Card -->
+            <div class="glass-panel glass-panel-glow rounded-3xl p-6 sm:p-8 space-y-6 relative overflow-hidden">
+                
+                <!-- Primary Single Download Button -->
+                <a id="main-download-btn" href="#" onclick="triggerDownload(event)" class="btn-glow w-full py-4 rounded-2xl bg-gradient-to-r from-brand-neonGreen via-emerald-400 to-brand-neonGreen text-slate-950 font-black text-base sm:text-lg flex items-center justify-center gap-3 shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all duration-200">
+                    <i class="fa-solid fa-download text-xl"></i>
+                    <span>Télécharger le Launcher</span>
+                </a>
+
+                <!-- File Info Badge -->
+                <div class="text-[11px] text-slate-400 flex items-center justify-center gap-3">
+                    <span class="font-mono text-slate-300">Z2T-Launcher-Setup.exe</span>
+                    <span class="text-slate-700">•</span>
+                    <span class="text-slate-400">v2.5.0</span>
+                </div>
+
+                <!-- Divider -->
+                <div class="relative py-1">
+                    <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-slate-800"></div></div>
+                    <div class="relative flex justify-center"><span class="bg-[#0f172a] px-3 text-[10px] font-bold uppercase tracking-widest text-slate-500">Ou connectez-vous directement</span></div>
+                </div>
+
+                <!-- Server IP Copy Component -->
+                <div class="bg-slate-950/80 rounded-2xl p-3.5 border border-slate-800/80 flex items-center justify-between gap-3 group hover:border-brand-neonGreen/40 transition-colors">
+                    <div class="text-left pl-1">
+                        <span class="block text-[10px] uppercase tracking-wider text-slate-500 font-bold">Adresse IP du serveur</span>
+                        <span class="font-mono text-sm sm:text-base font-bold text-white select-all tracking-wide" id="server-ip">play.z2t-mc.fr</span>
+                    </div>
+                    <button onclick="copyIP()" class="px-4 py-2.5 text-xs font-bold rounded-xl bg-brand-neonGreen/10 hover:bg-brand-neonGreen/20 text-brand-neonGreen border border-brand-neonGreen/30 transition-all flex items-center gap-2 shrink-0 active:scale-95">
+                        <i class="fa-regular fa-copy"></i>
+                        <span id="copy-btn-text">Copier l'IP</span>
+                    </button>
+                </div>
+
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Clean Footer -->
+    <footer class="py-6 text-center text-xs text-slate-600 relative z-10">
+        <p>© 2026 Z2T Minecraft Server. Tous droits réservés.</p>
+    </footer>
+
+    <!-- Notification Toast Modal -->
+    <div id="toast" class="fixed bottom-6 right-6 z-50 transform translate-y-24 opacity-0 transition-all duration-300 pointer-events-none">
+        <div class="glass-panel border border-brand-neonGreen/40 px-5 py-4 rounded-2xl shadow-2xl flex items-center gap-3.5 bg-slate-900/95">
+            <div id="toast-icon" class="w-9 h-9 rounded-xl bg-brand-neonGreen/20 text-brand-neonGreen flex items-center justify-center shrink-0">
+                <i class="fa-solid fa-check text-base"></i>
+            </div>
+            <div class="text-left">
+                <h4 id="toast-title" class="text-sm font-bold text-white">Action réussie</h4>
+                <p id="toast-message" class="text-xs text-slate-300">Message de notification.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript Logic & Animations -->
+    <script>
+        // HTML5 Canvas Particle Background Simulation
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+
+        let width, height;
+        let particles = [];
+
+        function resizeCanvas() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        class Particle {
+            constructor() {
+                this.reset();
+            }
+
+            reset() {
+                this.x = Math.random() * width;
+                this.y = Math.random() * height;
+                this.size = Math.random() * 2 + 0.5;
+                this.speedX = (Math.random() - 0.5) * 0.4;
+                this.speedY = (Math.random() - 0.5) * 0.4;
+                this.color = Math.random() > 0.4 ? '#10b981' : '#8b5cf6';
+                this.alpha = Math.random() * 0.5 + 0.1;
+            }
+
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+
+                if (this.x < 0 || this.x > width || this.y < 0 || this.y > height) {
+                    this.reset();
+                }
+            }
+
+            draw() {
+                ctx.save();
+                ctx.globalAlpha = this.alpha;
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        const particleCount = Math.min(Math.floor(window.innerWidth / 16), 65);
+        for (let i = 0; i < particleCount; i++) {
+            particles.push(new Particle());
+        }
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, width, height);
+            
+            particles.forEach(particle => {
+                particle.update();
+                particle.draw();
+            });
+
+            // Connect nearest particles with ambient glowing lines
+            for (let a = 0; a < particles.length; a++) {
+                for (let b = a + 1; b < particles.length; b++) {
+                    const dx = particles[a].x - particles[b].x;
+                    const dy = particles[a].y - particles[b].y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+
+                    if (dist < 110) {
+                        ctx.save();
+                        ctx.globalAlpha = (1 - dist / 110) * 0.12;
+                        ctx.strokeStyle = particles[a].color;
+                        ctx.lineWidth = 0.6;
+                        ctx.beginPath();
+                        ctx.moveTo(particles[a].x, particles[a].y);
+                        ctx.lineTo(particles[b].x, particles[b].y);
+                        ctx.stroke();
+                        ctx.restore();
+                    }
+                }
+            }
+
+            requestAnimationFrame(animateParticles);
+        }
+
+        animateParticles();
+
+        // Download Trigger
+        function triggerDownload(e) {
+            e.preventDefault();
+            const filename = 'Z2T-Launcher-Setup.exe';
+
+            showToast(
+                'Téléchargement lancé',
+                `Le fichier ${filename} est en cours de téléchargement.`
+            );
+
+            // Virtual file trigger for demo purposes
+            setTimeout(() => {
+                const dummyLink = document.createElement('a');
+                dummyLink.href = 'data:text/plain;charset=utf-8,' + encodeURIComponent('[Fichier Démo Launcher Z2T]');
+                dummyLink.download = filename;
+                document.body.appendChild(dummyLink);
+                dummyLink.click();
+                document.body.removeChild(dummyLink);
+            }, 600);
+        }
+
+        // Copy IP Address Functionality
+        function copyIP() {
+            const ipText = document.getElementById('server-ip').innerText;
+            
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(ipText);
+            } else {
+                const textArea = document.createElement('textarea');
+                textArea.value = ipText;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+            }
+
+            const copyBtnText = document.getElementById('copy-btn-text');
+            copyBtnText.innerText = 'Copié !';
+            setTimeout(() => {
+                copyBtnText.innerText = "Copier l'IP";
+            }, 2000);
+
+            showToast('IP Copiée !', `${ipText} a été copié dans le presse-papier.`);
+        }
+
+        // Toast Notification System
+        function showToast(title, message) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-title').innerText = title;
+            document.getElementById('toast-message').innerText = message;
+
+            toast.classList.remove('translate-y-24', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-24', 'opacity-0');
+            }, 3200);
+        }
+    </script>
+</body>
+</html>
